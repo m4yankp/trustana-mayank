@@ -1,51 +1,46 @@
-import express from 'express';
-import * as http from 'http';
-import * as bodyparser from 'body-parser';
-import * as winston from 'winston';
-import * as expressWinston from 'express-winston';
-import cors from 'cors'
-import {CommonRoutesConfig} from './common/common.routes.config';
-import {UsersRoutes} from './users/users.routes.config';
-import debug from 'debug';
+import * as express from "express";
+import * as bodyParser from "body-parser";
+import * as cors from "cors";
+import * as helmet from "helmet"; 
+import { connect } from "mongoose";
+import { UserRoutes } from "./routes/usersRoutes";
+import { CommonRoutes } from "./routes/index";
+import { AuthRoutes } from "./routes/authRoutes";
+import * as dotenv from 'dotenv';
 
-const app: express.Application = express();
-const server: http.Server = http.createServer(app);
-const port: Number = 3000;
-const routes: Array<CommonRoutesConfig> = [];
-const debugLog: debug.IDebugger = debug('app');
+class App {
+   public app: express.Application;
+   public userRoutes: UserRoutes = new UserRoutes();
+   public authRoutes: AuthRoutes = new AuthRoutes();
+   public commonRoutes: CommonRoutes = new CommonRoutes();
+   public JWTSeceret: string;
+   constructor() {
+      this.app = express();
+      this.middleWare();
+      this.userRoutes.route(this.app);
+      this.authRoutes.route(this.app);
+      this.commonRoutes.route(this.app);
+      this.connectDB();
+   }
+   private middleWare(): void {
+         // support application/json type post data
+         this.app.use(bodyParser.json());
+         //support application/x-www-form-urlencoded post data
+         this.app.use(helmet());
+         this.app.use(cors());
+         this.app.use(bodyParser.urlencoded({ extended: false }));
+      }
 
-app.use(bodyparser.json());
-app.use(cors());
-
-app.use(expressWinston.logger({
-    transports: [
-        new winston.transports.Console()
-    ],
-    format: winston.format.combine(
-        winston.format.colorize(),
-        winston.format.json()
-    )
-}));
-
-routes.push(new UsersRoutes(app));
-
-app.use(expressWinston.errorLogger({
-    transports: [
-        new winston.transports.Console()
-    ],
-    format: winston.format.combine(
-        winston.format.colorize(),
-        winston.format.json()
-    )
-}));
-
-
-app.get('/', (req: express.Request, res: express.Response) => {
-    res.status(200).send(`Server running at http://localhost:${port}`)
-});
-server.listen(port, () => {
-    debugLog(`Server running at http://localhost:${port}`);
-    routes.forEach((route: CommonRoutesConfig) => {
-        debugLog(`Routes configured for ${route.getName()}`);
-    });
-});
+   private connectDB = async() => {
+      dotenv.config();
+      await connect(process.env.MONGODBURL, {
+         useNewUrlParser: true,
+         useUnifiedTopology: true
+      }).then(()=>{
+         console.log("Mongo Db connected");
+      }).catch((err)=>{
+         console.log(err);
+      });
+   }
+}
+export default new App().app;
