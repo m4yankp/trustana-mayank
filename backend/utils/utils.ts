@@ -20,7 +20,7 @@ export default class Utils{
         const cipher = crypto.createCipheriv(this.algorithm, key, this.iv);
 
         const encrypted = Buffer.concat([cipher.update(data), cipher.final()]);
-        
+
         return {
             iv: this.iv.toString('hex'),
             content: encrypted.toString('hex')
@@ -48,4 +48,5 @@ export default class Utils{
 
         return key;
     }
+
 }

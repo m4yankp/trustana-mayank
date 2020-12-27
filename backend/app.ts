@@ -28,11 +28,12 @@ class App {
    private middleWare(): void {
          // support application/json type post data
          this.app.use(bodyParser.json());
+         this.app.use("/files", express.static("uploads"));
          //support application/x-www-form-urlencoded post data
          this.app.use(helmet());
          //Allow Cors
          this.app.use(cors());
-         this.app.use(bodyParser.urlencoded({ extended: false }));
+         this.app.use(bodyParser.urlencoded({ extended: false, limit: "100mb" }));
       }
 
    // Connect mongoose DB
