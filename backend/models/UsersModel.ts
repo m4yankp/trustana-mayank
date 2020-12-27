@@ -39,6 +39,5 @@ const UserSchema: Schema = new Schema({
 
 
 const UsersModel: Model<any> = model('UsersModel', UserSchema);
-UsersModel.createIndexes();
 
 export default UsersModel;

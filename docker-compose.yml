@@ -1,0 +1,30 @@
+version: '2'
+services:
+  frontend:
+    build: 
+      context: .
+      dockerfile: frontend/DockerFile
+    ports:
+      - '80:80'
+    depends_on:
+      - backend
+  backend:
+    container_name: backend
+    restart: always
+    build: 
+      context: .
+      dockerfile: backend/DockerFile
+    environment:
+      - PORT=4000
+      - MONGODBURL='mongodb://mongo/trustana
+      - JWT_SECRET=!a/3rP=#hGG57Jb?
+      - JWT_PUBLICDATA_SECRET=ez75D+xYwm9jZML%
+      - UPLOADS="uploads"
+    ports:
+      - '4000:4000'
+    depends_on:
+      - mongo
+  mongo:
+    image: mongo
+    ports:
+      - '27017:27017'
