@@ -9,7 +9,7 @@ export class UserRoutes {
 
    public route(app: Application) {
       app.post('/api/user', this.user.validateData, this.user.post);
-      app.get('/api/myData', this.auth.checkLogin, this.user.getDecryptedData);
+      app.post('/api/myData', this.auth.checkLogin, this.user.getDecryptedData);
       app.get('/api/getPublicData',this.auth.checkPublicAccess,this.user.getDataForPublic);
    }
 }

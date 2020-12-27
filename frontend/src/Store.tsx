@@ -20,8 +20,12 @@ function reducer(state: ILoggedInUser, action: IAction): ILoggedInUser {
     
     switch(action.type)
     {
-        case 'FETCH_USER_DETAIL':
-            return {...state,  firstName: action.payload.data.firstName }
+        case 'SET_TOKEN':
+            return {...state, loginToken: action.payload.token, username: action.payload.username}
+        case 'LOGOUT':
+            return {...state, firstName: '', lastName: '', dateOfBirth: '', address: '', username: '', password: '', filePath: '', loginToken: '', dateCreated: '' }
+        case 'GET_USER_DATA':
+            return {...state,  firstName: action.payload.firstName, lastName: action.payload.lastName, address: action.payload.address, dateOfBirth: action.payload.dateOfBirth, filePath: action.payload.filePath,  dateCreated: action.payload.dateCreated }
         default: 
             return state
     }

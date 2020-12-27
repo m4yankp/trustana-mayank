@@ -8,11 +8,11 @@ import { StoreProvider } from "./Store";
 export default function App():JSX.Element {
   return (
     <div className="d-flex flex-column min-vh-100">
-      <Header />
-        <StoreProvider>
+      <StoreProvider>
+        <Header />
           <Routes />
-        </StoreProvider>
-      <Footer />
+        <Footer />
+      </StoreProvider>
     </div>
   );
 }

@@ -1,18 +1,22 @@
-import React from 'react'
+import React, { useContext } from 'react'
 import { BrowserRouter, Route, Switch } from 'react-router-dom';
 import { Container, Row, Col } from 'react-bootstrap';
 import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
 import Register from './pages/Register';
 import Public from './pages/Public';
+import Logout from './pages/Logout';
+import { Store } from './Store';
 
 export default function Routes() {
+  const { state, dispatch } = useContext(Store);
     return (
        <BrowserRouter>
         <Switch>
           <Route exact path='/' component={Login} />
           <Route exact path='/register' component={Register} />
-          <Route exact path='/dashboard' component={Dashboard} />
+          {state.loginToken &&  <Route exact path='/dashboard' component={Dashboard} /> }
+          <Route exact path='/logout' component={Logout} />
           <Route exact path='/public/:token' component={Public} />
           <Route exact path='*' >
              <Container className="mt-3 mb-3">
