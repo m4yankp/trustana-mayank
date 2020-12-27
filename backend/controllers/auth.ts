@@ -1,32 +1,119 @@
-import { Request, Response } from "express";
+import { NextFunction, Request, Response } from "express";
+import * as bcrypt from 'bcrypt';
+import * as jwt from 'jsonwebtoken';
+import UsersModel from '../models/UsersModel';
+import * as dotenv from 'dotenv';
 
 export class AuthController {
+    constructor(){
+        dotenv.config();
+    }
+  // Login token
   static login = async (req: Request, res: Response) => {
     //Check if username and password are set
-    let { username, password } = req.body;
+    const { username, password } = req.body;
     if (!(username && password)) {
       res.status(400).send({
             "error": true,
             "message": "Unauthorized Access"
         });
     }
-
-    if(!(username == "cnyapp" && password == "uukZ!AC8@!V%B+mG"))
+    const user: any = await UsersModel.find({username});
+    if(user.length > 0)
+    {
+        bcrypt.compare(req.body.password, user[0].password, function(err, result) {
+            if(result == true)
+            {
+                const token = jwt.sign(
+                    { userId: user[0]._id, username: user[0].username }, process.env.JWT_SECRET,
+                    { expiresIn: "30d" }
+                );
+                res.send({
+                    "message": "Login Success",
+                    "token": token,
+                    "success": true,
+                    "error": false
+                });
+            }
+            else{
+                res.status(401).send({
+                    "error": true,
+                    "success": false,
+                    "message": "Unauthorized Access"
+                });
+            }
+        });
+    }
+    else
     {
         res.status(401).send({
             "error": true,
-            "message": "Unauthorized Access"
+            "success": false,
+            "message": "User Not Found"
         });
     }
-    
-    // const token = jwt.sign(
-    //   { userId: 1, username: username }, "2)3K_T@88YBfTSyT",
-    //   { expiresIn: "30d" }
-    // );
-
-    //Send the jwt in the response
-    res.send({
-        "message": "Login Success", "success": true});
-
   };
+  // Create a temporary token for public usage
+  public createTemporaryToken = async(req:Request, res: Response) => {
+        if(!req.body.secret_code)
+        {
+            res.status(400).send({
+                "success": false,
+                "error": true,
+                "message": "Please provide secret code"
+            });
+        }
+        if(!req.body.expiryTime){
+            res.status(400).send({
+                "success": false,
+                "error": true,
+                "message": "Please provide expiry time"
+            });
+        }
+        else{
+            const token = jwt.sign({ secret_code:req.body.secret_code, userId:res.locals.jwtPayload.userId }, process.env.JWT_PUBLICDATA_SECRET, {
+            expiresIn: req.body.expiryTime,
+            });
+            res.status(200).send({
+                "success":true,
+                "error": false,
+                "message": "Token for Public Usage",
+                "token": token
+            });
+        }
+    }
+  // Check If user is logged in or not
+  public checkLogin = async(req: Request, res: Response, next: NextFunction) => {
+    const token = <string>req.headers["authorization"].replace("Bearer ","");
+    let jwtPayload;
+        try {
+            jwtPayload = <any>jwt.verify(token, process.env.JWT_SECRET);
+            res.locals.jwtPayload = jwtPayload;
+            next();
+        } catch (error) {
+        //If token is not valid, respond with 401 (unauthorized)
+        res.status(401).send({
+            "error": true,
+            "success": false,
+            "message": "Unauthorized Access"
+        });
+        }
+    }
+    // Check if Public Access Token is Valid or not
+    public checkPublicAccess = async(req: Request, res: Response, next: NextFunction) =>{
+        const token = <string>req.headers["authorization"].replace("Bearer ","");
+        let jwtPayload;
+        try {
+            jwtPayload = <any>jwt.verify(token, process.env.JWT_PUBLICDATA_SECRET);
+            res.locals.jwtPayload = jwtPayload;
+            next();
+        } catch (error) {
+        //If token is not valid, respond with 401 (unauthorized)
+        res.status(401).send({
+            "error": true,
+            "success": false,
+            "message": "Unauthorized Access"
+        });
+        }
+    }
 }

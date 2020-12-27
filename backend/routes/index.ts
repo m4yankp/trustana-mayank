@@ -3,7 +3,7 @@ export class CommonRoutes {
    public route(app: Application) {
       // Mismatch URL
       app.all('*', function (req: Request, res: Response) {
-         res.status(404).send({ error: true, message: 'Check your URL please' });
+         res.status(404).send({ error: true, message: 'Check your URL as well as method' });
       });
    }
 }

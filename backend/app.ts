@@ -10,10 +10,13 @@ import * as dotenv from 'dotenv';
 
 class App {
    public app: express.Application;
+   // Import user Routes
    public userRoutes: UserRoutes = new UserRoutes();
+   // Import Auth Routes
    public authRoutes: AuthRoutes = new AuthRoutes();
+   // Import Common Routes
    public commonRoutes: CommonRoutes = new CommonRoutes();
-   public JWTSeceret: string;
+
    constructor() {
       this.app = express();
       this.middleWare();
@@ -27,15 +30,18 @@ class App {
          this.app.use(bodyParser.json());
          //support application/x-www-form-urlencoded post data
          this.app.use(helmet());
+         //Allow Cors
          this.app.use(cors());
          this.app.use(bodyParser.urlencoded({ extended: false }));
       }
 
+   // Connect mongoose DB
    private connectDB = async() => {
       dotenv.config();
       await connect(process.env.MONGODBURL, {
          useNewUrlParser: true,
-         useUnifiedTopology: true
+         useUnifiedTopology: true,
+         useCreateIndex: true
       }).then(()=>{
          console.log("Mongo Db connected");
       }).catch((err)=>{

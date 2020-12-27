@@ -1,5 +1,6 @@
-import { model, Schema, Model, Document } from 'mongoose';
+import { model, Schema, Model } from 'mongoose';
 
+// Create User Schema
 const UserSchema: Schema = new Schema({
     firstName:{
         type: Object,
@@ -19,7 +20,8 @@ const UserSchema: Schema = new Schema({
     },
     username:{
         type: String,
-        required: true
+        required: true,
+        unique: true
     },
     password:{
         type: String,
@@ -35,5 +37,8 @@ const UserSchema: Schema = new Schema({
     }
 });
 
+
 const UsersModel: Model<any> = model('UsersModel', UserSchema);
+UsersModel.createIndexes();
+
 export default UsersModel;

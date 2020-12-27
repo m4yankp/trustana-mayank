@@ -6,22 +6,27 @@ export default class Utils{
     public algorithm: string;
     public iv:Buffer;
     constructor(secret){
+        // Secret by user 
         this.key = secret;
+        // Algorithm AES 128 
         this.algorithm = 'aes-128-cbc';
+        // Create 16 digit random bytes buffer
         this.iv = crypto.randomBytes(16);
     }
+    // Encrypt data
     public encryptData(data:string): IHash {
         const key = this.getKey();
 
         const cipher = crypto.createCipheriv(this.algorithm, key, this.iv);
 
         const encrypted = Buffer.concat([cipher.update(data), cipher.final()]);
-
+        
         return {
             iv: this.iv.toString('hex'),
             content: encrypted.toString('hex')
         };
     }
+    // Decrypt Data
     public decryptData(hash:IHash): string{
         const key = this.getKey();
 
@@ -31,7 +36,10 @@ export default class Utils{
 
         return decrpyted.toString();
     }
+
+    // We convert the user entered secret into 16 digit to create a key as per crypto requirement
     public getKey(): Buffer{
+
         const hash = crypto.createHash("sha1");
 
         hash.update(this.key);

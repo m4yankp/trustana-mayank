@@ -1,57 +1,129 @@
 import { isString } from 'class-validator';
 import { NextFunction, Request, Response } from 'express';
-import jwt from 'jsonwebtoken';
+import * as bcrypt from 'bcrypt';
+import * as dotenv from 'dotenv';
 import UsersModel from '../models/UsersModel';
 import IUser from "../types/Users";
 import Utils from "../utils/utils";
 
 export class Users {
+    constructor(){
+        dotenv.config();
+    }
+    // Create a new User
     public post = async(req:Request,res:Response) => {
         const util: Utils = new Utils(req.body.secret_code);
-
-        const user: IUser = await UsersModel.create({
-            firstName: util.encryptData(req.body.firstName),
-            lastName: util.encryptData(req.body.lastName),
-            dateOfBirth: util.encryptData(req.body.dateOfBirth),
-            address: util.encryptData(req.body.address),
-            filePath: req.body.filePath,
-            username: req.body.username,
-            password: req.body.password
-        });
-
-        res.status(200).send({
-            "success":true,
-            "error": false,
-            "message": "User Created Successful!",
-            "data": user
+        const saltRounds = 10;
+        await bcrypt.hash(req.body.password, saltRounds, async(err, hash) =>{ 
+            if(err)
+            {
+                res.status(400).send({
+                    "success":false,
+                    "error": true,
+                    "message": "Error while creating error",
+                    "data": err
+                });
+            }
+            try{
+            const user: IUser = await UsersModel.create({
+                firstName: util.encryptData(req.body.firstName),
+                lastName: util.encryptData(req.body.lastName),
+                dateOfBirth: util.encryptData(req.body.dateOfBirth),
+                address: util.encryptData(req.body.address),
+                filePath: req.body.filePath,
+                username: req.body.username,
+                password: hash
+            });
+            res.status(200).send({
+                "success":true,
+                "error": false,
+                "message": "User Created Successful!",
+                "data": user
+            });
+            }
+            catch(error){
+                res.status(400).send({
+                    "success":false,
+                    "error": true,
+                    "message": error,
+                })
+            } 
         });
     }
-
-    public getAll = async(req:Request, res:Response) => {
-        const allUsers: IUser[] = await UsersModel.find({});
-        const util: Utils = new Utils(req.body.secret_code);
-        const ourUser:IUser = allUsers[0];
-
-        res.status(200).send({
-            "success":true,
-            "error": false,
-            "message": "UserData",
-            "firstName": util.decryptData(ourUser.firstName),
-            "lastName": util.decryptData(ourUser.lastName),
-            "address": util.decryptData(ourUser.address),
-        })
+    // Get decrypted data if user provides a secert code
+    public getDecryptedData = async(req:Request, res:Response) => {
+        if(!req.body.secret_code)
+        {
+            res.status(400).send({
+                "success": false,
+                "error": true,
+                "message": "Please provide the secert code"
+            })
+        }
+        try{
+            const user: IUser = await UsersModel.findById({_id:res.locals.jwtPayload.userId});
+            const util: Utils = new Utils(req.body.secret_code);
+            res.status(200).send({
+                "success":true,
+                "error": false,
+                "message": "User's Decrypted Data",
+                "firstName": util.decryptData(user.firstName),
+                "lastName": util.decryptData(user.lastName),
+                "address": util.decryptData(user.address),
+                "dateOfBirth": util.decryptData(user.dateOfBirth)
+            })
+        }catch(error){
+            res.status(400).send({
+                "success": false,
+                "error": true,
+                "message": error.reason
+            })
+        }
     }
 
-    public createToken = async(req:Request, res: Response) => {
-    
-        const token = jwt.sign({ secret_code:"0920040920041234" }, "abcjwt", {
-            expiresIn: 10,
-        });
-        console.log(token);
-        console.log(jwt.decode(token));
+    // Get Data For Public use with expiry set by User
+    public getDataForPublic = async(req: Request, res: Response) =>{
+        if(!res.locals.jwtPayload.secret_code)
+        {
+            res.status(400).send({
+                "success": false,
+                "error": true,
+                "message": "Invalid Token"
+            })
+        }
+        if(!res.locals.jwtPayload.userId)
+        {
+            res.status(400).send({
+                "success": false,
+                "error": true,
+                "message": "Invalid Token"
+            })
+        }
+        else
+        {
+            try{
+                const user: IUser = await UsersModel.findById({_id:res.locals.jwtPayload.userId});
+                const util: Utils = new Utils(res.locals.jwtPayload.secret_code);
+                res.status(200).send({
+                    "success":true,
+                    "error": false,
+                    "message": "User's Decrypted Data",
+                    "firstName": util.decryptData(user.firstName),
+                    "lastName": util.decryptData(user.lastName),
+                    "address": util.decryptData(user.address),
+                    "dateOfBirth": util.decryptData(user.dateOfBirth)
+                })
+            }catch(error){
+                res.status(400).send({
+                    "success": false,
+                    "error": true,
+                    "message": error.reason
+                })
+            }
+        }
     }
 
-
+    // Validate data
     public validateData = async(req : Request,res : Response, next: NextFunction) =>{
         if(!req.body.firstName && !isString(req.body.firstName))
         {
