@@ -28,7 +28,15 @@ const UserSchema: Schema = new Schema({
         required: true
     },
     filePath:{
-        type: Object,
+        type: String,
+        required: true
+    },
+    fileType:{
+        type: String,
+        required: true
+    },
+    fileName:{
+        type: String,
         required: true
     },
     created:{

@@ -9,4 +9,6 @@ export default interface IUser extends Document{
     username: String,
     password: String,
     filePath: String,
+    fileType: String,
+    fileName: String
 }

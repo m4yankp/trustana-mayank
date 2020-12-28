@@ -1,11 +1,14 @@
 import * as crypto from "crypto";
+import * as fs from "fs";
+import {Response} from "express";
 import IHash from "../types/Hash";
 
 export default class Utils{
     public key: string;
     public algorithm: string;
     public iv:Buffer;
-    constructor(secret){
+    
+    constructor(secret: string){
         // Secret by user 
         this.key = secret;
         // Algorithm AES 128 
@@ -41,7 +44,6 @@ export default class Utils{
     public getKey(): Buffer{
 
         const hash = crypto.createHash("sha1");
-
         hash.update(this.key);
 
         let key = Buffer.from(hash.digest("hex").substring(0, 16), "binary");
@@ -49,4 +51,23 @@ export default class Utils{
         return key;
     }
 
+    public encryptFile = (buffer : Buffer) => {
+        
+        const cipher = crypto.createCipheriv(this.algorithm,this.getKey(), this.iv);
+        // Create the new (encrypted) buffer
+        const result = Buffer.concat([this.iv, cipher.update(buffer), cipher.final()]);
+        return result;
+    };
+
+    public decryptFile = (encrypted : Buffer) =>{
+        const iv = encrypted.slice(0, 16);
+        // Get the rest
+        encrypted = encrypted.slice(16);
+        const key = this.getKey();
+        // Create a decipher
+        const decipher = crypto.createDecipheriv(this.algorithm, key, iv);
+        // Actually decrypt it
+        const result = Buffer.concat([decipher.update(encrypted), decipher.final()]);
+        return result;
+    }
 }
