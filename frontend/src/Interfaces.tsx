@@ -7,7 +7,15 @@ export interface IUser{
     username: String;
     password: String;
     filePath: String;
+}
 
+export interface IUserData {
+    firstName: String;
+    lastName: String;
+    dateOfBirth: String;
+    address: String;
+    filePath: String;
+    dateCreated: String;
 }
 
 export interface ILoggedInUser extends IUser{

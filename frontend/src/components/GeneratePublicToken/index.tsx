@@ -1,5 +1,6 @@
 import React, { useContext } from 'react';
 import { Row, Col, Form, Button, Alert } from 'react-bootstrap'
+import * as dotenv from 'dotenv';
 import { PublicToken } from '../../services';
 import Loader from '../../layout/Loader';
 import { useFormFields } from '../../hooks';
@@ -7,6 +8,7 @@ import { Store } from '../../Store';
 
 
 export default function GeneratePublicToken(): JSX.Element {
+  dotenv.config();
   const { state, dispatch } = useContext(Store);
    const { formFields, createChangeHandler, setValue } = useFormFields({
       isLoadingPublic: false,
@@ -55,7 +57,7 @@ export default function GeneratePublicToken(): JSX.Element {
         <Col md="12">
 
      <Form noValidate validated={formFields.validatedPublicForm} onSubmit={handleSubmitPublicForm}>
-         {formFields.isErrorPublic && <Alert data-testid="alert" variant="danger">Invalid Secret Code</Alert>}
+         {formFields.isErrorPublic && <Alert data-testid="alert" variant="danger">Invalid Secret Code or expiry time</Alert>}
       <Form.Row>
           <Form.Group as={Col} md="12" controlId="validationCustomToken">
           <Form.Label>Secret Code</Form.Label>
@@ -74,13 +76,13 @@ export default function GeneratePublicToken(): JSX.Element {
           <Form.Label>Link expiry Time</Form.Label>
             <Form.Control
               type="text"
-              placeholder="Time You Want your data to be available for with link that will be generated"
+              placeholder='Time should be a number of seconds or string representing a timespan eg: "1d", "20h"'
               value={formFields.expiryTime}
               onChange={createChangeHandler("expiryTime")}
               required
             />
             <Form.Control.Feedback type="invalid">
-             Please enter a valid expiry time.
+             Please enter a valid expiry time. It should be a number of seconds or string representing a timespan eg: "1d", "20h"
             </Form.Control.Feedback>
         </Form.Group>
         </Form.Row>
@@ -93,7 +95,7 @@ export default function GeneratePublicToken(): JSX.Element {
               <Form.Control
                 className="mt-4"
                 type="text" 
-                value={`http://localhost:3000/public/${formFields.publicToken}`}
+                value={`${process.env.REACT_APP_URL}/#/public/${formFields.publicToken}`}
                 readOnly={true}
               />
             </Col>

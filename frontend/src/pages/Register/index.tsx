@@ -1,13 +1,13 @@
 import React, { useState } from 'react'
 import { Container, Row, Col, Form, Button, Alert } from 'react-bootstrap';
+import { Link } from 'react-router-dom';
 import { useFormFields } from '../../hooks';
+import { RegisterService } from "../../services";
 
-// import { API_URL } from '../../config'
 import Loader from '../../layout/Loader'
 
 export default function Register(): JSX.Element {
 
-const [validated, setValidated] = useState(false);
 const { formFields, createChangeHandler, setValue } = useFormFields({
   firstName: "",
   lastName: "",
@@ -23,10 +23,11 @@ const { formFields, createChangeHandler, setValue } = useFormFields({
   isLoading:false,
   isError:false,
   validated:false,
-  message:""
+  message:"",
+  isComplete:false
 }) 
   
-  const handleSubmit = (event: any) => {
+  const handleSubmit = async(event: any) => {
     const form = event.currentTarget;
     event.preventDefault();
     event.stopPropagation();
@@ -40,20 +41,56 @@ const { formFields, createChangeHandler, setValue } = useFormFields({
     if (form.checkValidity() === true) {
       //Form is valid 
       setValue("isLoading",true);
-     
+      setValue("validated",true);
+      const address = `${formFields.address}, ${formFields.city}, ${formFields.state}, ${formFields.zip}`;
+      const response = await RegisterService(formFields.firstName, formFields.lastName, formFields.dateOfBirth,formFields.username, formFields.password, formFields.secretToken, address,cvFile);
+      if(response.error)
+      {
+        if(response.message.code === 11000)
+        {
+          setValue("message","Username already exists, please try a different username");
+          setValue("isError",true);
+        }
+        else if(response.message.code)
+        {
+          setValue("message",response.message.code);
+          setValue("isError",true);
+        }
+        else
+        {
+          setValue("message",response.message);
+          setValue("isError",true);
+        }
+      }
+      else
+      {
+        setValue("isError",false);
+        setValue("firstName","");
+        setValue("lastName","");
+        setValue("dateOfBirth","");
+        setValue("username","");
+        setValue("password","");
+        setValue("password2","");
+        setValue("secretToken","");
+        setValue("address","");
+        setValue("city","");
+        setValue("state","");
+        setValue("zip","");
+        setValue("isComplete",true);
+      }
+      setValue("isLoading",false);
+      setValue("validated",false);
     }
-  
   };
 
 
   const maxDate = ()=>{
    return new Date().toISOString().split("T")[0];
   }
-  const [videoFile, setVideoFile] = useState('')
-  const [error, setError] = useState('success')
+  const [cvFile, setCvFile] = useState('')
   const fileHandler = (e: any): void => {
     if (e.target.files[0]) {
-      setVideoFile((curr) => (curr = e.target.files[0]))
+      setCvFile((curr) => (curr = e.target.files[0]))
     }
   }
   return (
@@ -66,6 +103,7 @@ const { formFields, createChangeHandler, setValue } = useFormFields({
       <Row>
         <Col md="12">
           {formFields.isError && <Alert data-testid="alert" variant="danger">{formFields.message}</Alert>}
+          {formFields.isComplete && <Alert data-testid="alert" variant="success">Registration Successful! <Link to="/">Click here to Login</Link></Alert>}
         <Form noValidate validated={formFields.validated} onSubmit={handleSubmit}>
       <Form.Row>
         <Form.Group as={Col} md="4" controlId="validationCustom01">
@@ -210,6 +248,18 @@ const { formFields, createChangeHandler, setValue } = useFormFields({
           <Form.Control.Feedback type="invalid">
             Please provide a valid zip.
           </Form.Control.Feedback>
+        </Form.Group>
+      </Form.Row>
+      <Form.Row>
+        <Form.Group controlId="formBasicUploadCV">
+          <Form.Label>Select CV File</Form.Label>
+          <Form.Control type="file" name="cv" onChange={(e) => fileHandler(e)} data-testid="cvFile" required/>
+          <Form.Control.Feedback type="invalid">
+            Please Select a valid file
+          </Form.Control.Feedback>
+          <Form.Text className="text-muted">
+            Please make sure you upload a .pdf/.doc/.docx file with maximum 20 mb size.
+          </Form.Text>
         </Form.Group>
       </Form.Row>
      {!formFields.isLoading ? <Button variant="primary" type="submit">

@@ -16,43 +16,42 @@ export default function Login(): JSX.Element {
     isError:false
   });
   const history = useHistory();
-   const handleSubmit = (event: any) =>{
-      
-    }
-  // const handleSubmit = async(event: any) => {
-  //   const form = event.currentTarget;
-  //   setFormFields({username:formFields.username,password:formFields.password,isLoading:true,validated:true,isError:false})
-  //   event.preventDefault();
-  //   event.stopPropagation();
-  //   if (form.checkValidity() === false) {
-  //     setFormFields({username:formFields.username,password:formFields.password,isLoading:false,validated:true,isError:false})
-  //   }
-  //  else{
-  //     formFields.isLoading = false;
-  //     if(formFields.username.length > 0 && formFields.password.length > 0)
-  //     {
-  //       const response = await LoginService(formFields.username,formFields.password);
-  //       setFormFields({username:'',password:'',isLoading:false,validated:false,isError:false})
-  //       if(response.error === true)
-  //       {
-  //         setFormFields({username:'',password:'',isLoading:false,validated:false,isError:true})
-  //       }
-  //       else
-  //       {
-  //         dispatch({
-  //           type:'SET_TOKEN',
-  //           payload: {
-  //             token: response.token,
-  //             username: formFields.username
-  //           }
-  //         });
-  //         history.push('/dashboard');
-  //         setFormFields({username:formFields.username,password:formFields.password,isLoading:false,validated:false,isError:false})
 
-  //       }
-  //     }
-  //  }
-  // };
+  const handleSubmit = async(event: any) => {
+    const form = event.currentTarget;
+    setValue("isLoading",true);
+    setValue("validated",true);
+    event.preventDefault();
+    event.stopPropagation();
+    if (form.checkValidity() === false) {
+      setValue("isLoading",false);
+    }
+   else{
+      formFields.isLoading = false;
+      if(formFields.username.length > 0 && formFields.password.length > 0)
+      {
+        const response = await LoginService(formFields.username,formFields.password);
+        setValue("isLoading",false);
+        setValue("validated",false);
+        if(response.error === true)
+        {
+          setValue("isError",true);
+        }
+        else
+        {
+          dispatch({
+            type:'SET_TOKEN',
+            payload: {
+              token: response.token,
+              username: formFields.username
+            }
+          });
+          history.push('/dashboard');
+          setValue("isError",false);
+        }
+      }
+   }
+  };
    return (
     <Container className="mt-3 mb-3">
       <Row>
@@ -63,7 +62,7 @@ export default function Login(): JSX.Element {
       <Row>
         <Col md="12">
           {formFields.isError && <Alert data-testid="alert" variant="danger">Invalid username and password</Alert>}
-       <Form noValidate validated={formFields.validated} onSubmit={handleSubmit}>
+       <Form noValidate validated={formFields.validated} onSubmit={handleSubmit} data-testid="loginForm">
       <Form.Row>
           <Form.Group as={Col} md="12" controlId="validationCustomUsername">
           <Form.Label>Username</Form.Label>
@@ -73,6 +72,7 @@ export default function Login(): JSX.Element {
               value={formFields.username}
               onChange={createChangeHandler("username")}
               required
+              data-testid="username"
             />
             <Form.Control.Feedback type="invalid">
              Please enter a valid username.
@@ -88,13 +88,14 @@ export default function Login(): JSX.Element {
               value={formFields.password}
               onChange={createChangeHandler("password")}
               required
+              data-testid="password"
             />
             <Form.Control.Feedback type="invalid">
               Please enter a password.
             </Form.Control.Feedback>
           </Form.Group>
         </Form.Row>
-          {!formFields.isLoading ? <Button variant="primary" type="submit">
+          {!formFields.isLoading ? <Button variant="primary" type="submit" data-testid="submitBtn">
             Login
           </Button> : <Loader />}
               </Form>

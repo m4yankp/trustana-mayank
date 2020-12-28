@@ -15,58 +15,33 @@ export default function GetUserData(): JSX.Element {
       validated: false,
       secretToken: ''
     });
-    const handleSubmit = (event: any) =>{
-      
-    }
-    // const handleSubmit = async(event: any) => {
-    //     const form = event.currentTarget;
-    //     event.preventDefault();
-    //     event.stopPropagation();
-    //     setFormFields({
-    //       isLoading: false,
-    //       isError: false,
-    //       validated: true,
-    //       secretToken: formFields.secretToken
-    //     });
-    //     if (!form.checkValidity() === false) {
-    //     setFormFields({
-    //       isLoading: true,
-    //       isError: false,
-    //       validated: true,
-    //       secretToken: formFields.secretToken
-    //     });
-    //     const response = await LoggedInUserData(state.loginToken, formFields.secretToken);
-    //     setFormFields({
-    //       isLoading: false,
-    //       isError: false,
-    //       validated: true,
-    //       secretToken: formFields.secretToken
-    //     });
-    //     if(response.error)
-    //     {
-    //        setFormFields({
-    //         isLoading: false,
-    //         isError: true,
-    //         validated: true,
-    //         secretToken: formFields.secretToken
-    //       });
-    //     }
-    //     else
-    //     {
-    //         dispatch({
-    //         type: 'GET_USER_DATA',
-    //         payload: response
-    //         });
-    //         setFormFields({
-    //           isLoading: false,
-    //           isError: false,
-    //           validated: false,
-    //           secretToken: ''
-    //         });
-    //     }
-    //     }
+   
+    const handleSubmit = async(event: any) => {
+        const form = event.currentTarget;
+        event.preventDefault();
+        event.stopPropagation();
+        setValue("validated",true);
+        if (!form.checkValidity() === false) {
+        setValue("isLoading",true);
+        const response = await LoggedInUserData(state.loginToken, formFields.secretToken);
+        setValue("isLoading",false);
+        if(response.error)
+        {
+            setValue("isError",true);
+        }
+        else
+        {
+            dispatch({
+            type: 'GET_USER_DATA',
+            payload: response
+            });
+            setValue("validated",false);
+            setValue("secretToken","");
+            setValue("isError",false);
+        }
+        }
     
-  // };
+  };
  return ( 
     <Row>
         <Col md="12">    
