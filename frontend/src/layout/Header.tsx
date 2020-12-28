@@ -12,11 +12,11 @@ export default function Header(): JSX.Element {
       <Navbar.Toggle aria-controls="basic-navbar-nav" />
       <Navbar.Collapse id="basic-navbar-nav" className="justify-content-end">
        {!state.loginToken ? <Nav className="ml-auto">
-          <Nav.Link href="/register">Register</Nav.Link>
-          <Nav.Link href="/">Login</Nav.Link> 
+          <Nav.Link href="/#/register">Register</Nav.Link>
+          <Nav.Link href="/#/">Login</Nav.Link> 
         </Nav> : 
         <Nav className="ml-auto">
-        <Nav.Link href="/logout">Logout</Nav.Link> 
+        <Nav.Link href="/#/logout">Logout</Nav.Link> 
         </Nav>}
       </Navbar.Collapse>
     </Navbar>

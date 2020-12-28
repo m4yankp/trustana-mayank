@@ -1,5 +1,5 @@
 import React, { useContext } from 'react'
-import { BrowserRouter, Route, Switch } from 'react-router-dom';
+import { HashRouter, Route, Switch } from 'react-router-dom';
 import { Container, Row, Col } from 'react-bootstrap';
 import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
@@ -11,14 +11,14 @@ import { Store } from './Store';
 export default function Routes() {
   const { state, dispatch } = useContext(Store);
     return (
-       <BrowserRouter>
+       <HashRouter>
         <Switch>
           <Route exact path='/' component={Login} />
           <Route exact path='/register' component={Register} />
           {state.loginToken &&  <Route exact path='/dashboard' component={Dashboard} /> }
           <Route exact path='/logout' component={Logout} />
           <Route exact path='/public/:token' component={Public} />
-          <Route exact path='*' >
+          <Route path='*' >
              <Container className="mt-3 mb-3">
                 <Row>
                     <Col md={12}>
@@ -28,6 +28,6 @@ export default function Routes() {
              </Container>
           </Route>
         </Switch>
-      </BrowserRouter>
+      </HashRouter>
     )
 }

@@ -1,57 +1,58 @@
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useContext } from 'react';
 import { Link, useHistory } from 'react-router-dom';
 import { Container, Row, Col, Form, Button, Alert } from 'react-bootstrap'
 import { LoginService } from '../../services/';
+import { useFormFields } from '../../hooks';
 import Loader from '../../layout/Loader'
 import { Store } from '../../Store'
 
 export default function Login(): JSX.Element {
   const { state, dispatch } = useContext(Store);
-  const [isLoading, setLoading] = useState(false);
-  const [validated, setValidated] = useState(false);
-  const [isError, setError] = useState(false);
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
+  const { formFields, createChangeHandler, setValue } = useFormFields({
+    username:'',
+    password:'',
+    isLoading:false,
+    validated:false,
+    isError:false
+  });
   const history = useHistory();
-  
-  const handleSubmit = async(event: any) => {
-    const form = event.currentTarget;
-    setValidated(true);
-    event.preventDefault();
-    event.stopPropagation();
-    if (form.checkValidity() === false) {
-      setLoading(false);
+   const handleSubmit = (event: any) =>{
+      
     }
-   else{
-      setLoading(true);
-      if(username.length > 0 && password.length > 0)
-      {
-        const response = await LoginService(username,password);
-        setLoading(false); 
-        setUsername('');
-        setPassword('');
-        setValidated(false);
-        if(response.error === true)
-        {
-          setError(true);
-        }
-        else
-        {
-          
-          dispatch({
-            type:'SET_TOKEN',
-            payload: {
-              token: response.token,
-              username: username
-            }
-          });
-          history.push('/dashboard');
-          setError(false);
+  // const handleSubmit = async(event: any) => {
+  //   const form = event.currentTarget;
+  //   setFormFields({username:formFields.username,password:formFields.password,isLoading:true,validated:true,isError:false})
+  //   event.preventDefault();
+  //   event.stopPropagation();
+  //   if (form.checkValidity() === false) {
+  //     setFormFields({username:formFields.username,password:formFields.password,isLoading:false,validated:true,isError:false})
+  //   }
+  //  else{
+  //     formFields.isLoading = false;
+  //     if(formFields.username.length > 0 && formFields.password.length > 0)
+  //     {
+  //       const response = await LoginService(formFields.username,formFields.password);
+  //       setFormFields({username:'',password:'',isLoading:false,validated:false,isError:false})
+  //       if(response.error === true)
+  //       {
+  //         setFormFields({username:'',password:'',isLoading:false,validated:false,isError:true})
+  //       }
+  //       else
+  //       {
+  //         dispatch({
+  //           type:'SET_TOKEN',
+  //           payload: {
+  //             token: response.token,
+  //             username: formFields.username
+  //           }
+  //         });
+  //         history.push('/dashboard');
+  //         setFormFields({username:formFields.username,password:formFields.password,isLoading:false,validated:false,isError:false})
 
-        }
-      }
-   }
-  };
+  //       }
+  //     }
+  //  }
+  // };
    return (
     <Container className="mt-3 mb-3">
       <Row>
@@ -61,16 +62,16 @@ export default function Login(): JSX.Element {
       </Row>
       <Row>
         <Col md="12">
-          {isError && <Alert data-testid="alert" variant="danger">Invalid username and password</Alert>}
-       <Form noValidate validated={validated} onSubmit={handleSubmit}>
+          {formFields.isError && <Alert data-testid="alert" variant="danger">Invalid username and password</Alert>}
+       <Form noValidate validated={formFields.validated} onSubmit={handleSubmit}>
       <Form.Row>
           <Form.Group as={Col} md="12" controlId="validationCustomUsername">
           <Form.Label>Username</Form.Label>
             <Form.Control
               type="text"
-              value={username}
               placeholder="Username"
-              onChange={(e) => setUsername(e.target.value)}
+              value={formFields.username}
+              onChange={createChangeHandler("username")}
               required
             />
             <Form.Control.Feedback type="invalid">
@@ -83,9 +84,9 @@ export default function Login(): JSX.Element {
           <Form.Label>Password</Form.Label>
             <Form.Control
               type="password"
-              value={password}
               placeholder="Password"
-              onChange={(e) => setPassword(e.target.value)}
+              value={formFields.password}
+              onChange={createChangeHandler("password")}
               required
             />
             <Form.Control.Feedback type="invalid">
@@ -93,7 +94,7 @@ export default function Login(): JSX.Element {
             </Form.Control.Feedback>
           </Form.Group>
         </Form.Row>
-          {!isLoading ? <Button variant="primary" type="submit">
+          {!formFields.isLoading ? <Button variant="primary" type="submit">
             Login
           </Button> : <Loader />}
               </Form>

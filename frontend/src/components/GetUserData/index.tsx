@@ -1,43 +1,72 @@
-import React, { useState, useContext } from 'react';
+import React, { useContext } from 'react';
 import { Row, Col, Form, Button, Alert } from 'react-bootstrap'
 import { LoggedInUserData } from '../../services';
 import UserData from '../../components/userData';
+import { useFormFields } from '../../hooks';
 import Loader from '../../layout/Loader';
 import { Store } from '../../Store';
 
 
 export default function GetUserData(): JSX.Element {
     const { state, dispatch } = useContext(Store);
-    const [isLoading, setLoading] = useState(false);
-    const [isError, setError] = useState(false);
-    const [validated, setValidated] = useState(false);
-    const [secretToken, setSecretToken] = useState('');
-    const handleSubmit = async(event: any) => {
-        const form = event.currentTarget;
-        event.preventDefault();
-        event.stopPropagation();
-        setValidated(true);
-        if (!form.checkValidity() === false) {
-        setLoading(true);
-        const response = await LoggedInUserData(state.loginToken, secretToken);
-        setLoading(false);
-        if(response.error)
-        {
-            setError(true);
-        }
-        else
-        {
-            dispatch({
-            type: 'GET_USER_DATA',
-            payload: response
-            });
-            setError(false);
-            setSecretToken('');
-            setValidated(false);
-        }
-        }
+    const { formFields, createChangeHandler, setValue } = useFormFields({
+      isLoading: false,
+      isError: false,
+      validated: false,
+      secretToken: ''
+    });
+    const handleSubmit = (event: any) =>{
+      
+    }
+    // const handleSubmit = async(event: any) => {
+    //     const form = event.currentTarget;
+    //     event.preventDefault();
+    //     event.stopPropagation();
+    //     setFormFields({
+    //       isLoading: false,
+    //       isError: false,
+    //       validated: true,
+    //       secretToken: formFields.secretToken
+    //     });
+    //     if (!form.checkValidity() === false) {
+    //     setFormFields({
+    //       isLoading: true,
+    //       isError: false,
+    //       validated: true,
+    //       secretToken: formFields.secretToken
+    //     });
+    //     const response = await LoggedInUserData(state.loginToken, formFields.secretToken);
+    //     setFormFields({
+    //       isLoading: false,
+    //       isError: false,
+    //       validated: true,
+    //       secretToken: formFields.secretToken
+    //     });
+    //     if(response.error)
+    //     {
+    //        setFormFields({
+    //         isLoading: false,
+    //         isError: true,
+    //         validated: true,
+    //         secretToken: formFields.secretToken
+    //       });
+    //     }
+    //     else
+    //     {
+    //         dispatch({
+    //         type: 'GET_USER_DATA',
+    //         payload: response
+    //         });
+    //         setFormFields({
+    //           isLoading: false,
+    //           isError: false,
+    //           validated: false,
+    //           secretToken: ''
+    //         });
+    //     }
+    //     }
     
-  };
+  // };
  return ( 
     <Row>
         <Col md="12">    
@@ -48,16 +77,16 @@ export default function GetUserData(): JSX.Element {
       </Row> } 
       <Row>
         <Col md="12">
-       <Form noValidate validated={validated} onSubmit={handleSubmit}>
-         {isError && <Alert data-testid="alert" variant="danger">Invalid Secret Code</Alert>}
+       <Form noValidate validated={formFields.validated} onSubmit={handleSubmit}>
+         {formFields.isError && <Alert data-testid="alert" variant="danger">Invalid Secret Code</Alert>}
       <Form.Row>
           <Form.Group as={Col} md="12" controlId="validationCustomUsername">
           <Form.Label>Secret Code</Form.Label>
             <Form.Control
               type="text"
-              value={secretToken}
               placeholder="Secret Token To Access Your Data"
-              onChange={(e) => setSecretToken(e.target.value)}
+              value={formFields.secretToken}
+              onChange={createChangeHandler("secretToken")}
               required
             />
             <Form.Control.Feedback type="invalid">
@@ -65,7 +94,7 @@ export default function GetUserData(): JSX.Element {
             </Form.Control.Feedback>
         </Form.Group>
         </Form.Row>
-          {!isLoading ? <Button variant="primary" type="submit">
+          {!formFields.isLoading ? <Button variant="primary" type="submit">
             Decrypt My Data
           </Button> : <Loader /> }
               </Form>
