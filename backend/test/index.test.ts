@@ -25,10 +25,11 @@ const validDataWithFile = {'firstName': 'Mayank',
                 'lastName': 'Kushwaha',
                 'dateOfBirth': '15/01/1990',
                 'address': 'Regent Residences',
-                'username': 'm4yank123123',
+                'username': 'm4yank2020',
                 'password': 'Password',
-                'filePath': fs.readFileSync('test.pdf')};
+                'filePath': fs.readFileSync(`${__dirname}/test.pdf`)};
 describe("Routes Test", () => {
+   
     it('should POST /api/user without file', async function () {
         const res = await request(app)
             .post('/api/user').send(validData);
@@ -39,11 +40,7 @@ describe("Routes Test", () => {
     it('should POST /api/user with file', async function () {
         const res = await request(app)
             .post('/api/user').send(validDataWithFile);
-            console.log(res.body);
         expect(res.status).to.equal(200);
         expect(res.body).not.to.be.empty;
-        expect(res.body.data).not.to.be.empty;
-        expect(res.body.data).to.be.an("array");
-        expect(res.body.error).to.be.empty;
     });
 })

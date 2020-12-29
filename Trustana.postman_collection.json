@@ -1,0 +1,271 @@
+{
+	"info": {
+		"_postman_id": "cc3e0479-a5a2-4701-9bc2-3ec1d129ddf1",
+		"name": "Trustana",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Register New User",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "firstName",
+							"value": "Mayank",
+							"type": "text"
+						},
+						{
+							"key": "secret",
+							"value": "0920040920041234",
+							"type": "text"
+						},
+						{
+							"key": "lastName",
+							"value": "Kushwaha",
+							"type": "text"
+						},
+						{
+							"key": "dateOfBirth",
+							"value": "15/01/1990",
+							"type": "text"
+						},
+						{
+							"key": "address",
+							"value": "Regent Residences",
+							"type": "text"
+						},
+						{
+							"key": "username",
+							"value": "m4yank",
+							"type": "text"
+						},
+						{
+							"key": "password",
+							"value": "Password",
+							"type": "text"
+						},
+						{
+							"key": "filePath",
+							"type": "file",
+							"src": "/Users/mayankkushwaha/Documents/resumes/Mayank's CV_20thNov.pdf"
+						}
+					]
+				},
+				"url": {
+					"raw": "localhost:4000/api/user",
+					"host": [
+						"localhost"
+					],
+					"port": "4000",
+					"path": [
+						"api",
+						"user"
+					]
+				},
+				"description": "API to register a new user with file"
+			},
+			"response": []
+		},
+		{
+			"name": "Create Public URL Token",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI1ZmU4MzJhZTdiZTkwYTgwZTE1OGI3YjUiLCJ1c2VybmFtZSI6Im00eWFuayIsImlhdCI6MTYwOTA1MzU5NSwiZXhwIjoxNjExNjQ1NTk1fQ.BnmAhajVzn9k2LmlOyLPIz6GXMA9NQ0zuoE3fGFY70M",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "secret_code",
+							"value": "0920040920041234",
+							"type": "text"
+						},
+						{
+							"key": "expiryTime",
+							"value": "30m",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "localhost:4000/api/createTemporaryToken",
+					"host": [
+						"localhost"
+					],
+					"port": "4000",
+					"path": [
+						"api",
+						"createTemporaryToken"
+					]
+				},
+				"description": "Create a token to be used in public URL so the user's data can be accessed with this URL directly without login"
+			},
+			"response": []
+		},
+		{
+			"name": "Get Logged In User's Data",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI1ZmU4MzJhZTdiZTkwYTgwZTE1OGI3YjUiLCJ1c2VybmFtZSI6Im00eWFuayIsImlhdCI6MTYwOTA1MzU5NSwiZXhwIjoxNjExNjQ1NTk1fQ.BnmAhajVzn9k2LmlOyLPIz6GXMA9NQ0zuoE3fGFY70M",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "secret_code",
+							"value": "0920040920041234",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "localhost:4000/api/myData",
+					"host": [
+						"localhost"
+					],
+					"port": "4000",
+					"path": [
+						"api",
+						"myData"
+					]
+				},
+				"description": "Get data of logged in user using the secret_code that user has created while registering"
+			},
+			"response": []
+		},
+		{
+			"name": "Get Data For Public URL",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzZWNyZXRfY29kZSI6IjA5MjAwNDA5MjAwNDEyMzQiLCJ1c2VySWQiOiI1ZmU4MzJhZTdiZTkwYTgwZTE1OGI3YjUiLCJpYXQiOjE2MDkwNTUwODMsImV4cCI6MTYwOTA1Njg4M30.6N6qC4eZUsiDxzFVLAv2IZ1FntNcAonztg5eN3GRuBc",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": []
+				},
+				"url": {
+					"raw": "localhost:4000/api/getPublicData",
+					"host": [
+						"localhost"
+					],
+					"port": "4000",
+					"path": [
+						"api",
+						"getPublicData"
+					]
+				},
+				"description": "Get the Data as per token provided by public url"
+			},
+			"response": []
+		},
+		{
+			"name": "Get Decrypted File With File Token",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzZWNyZXRfY29kZSI6IjA5MjAwNDA5MjAwNDEyMzQiLCJ1c2VySWQiOiI1ZmU4MzJhZTdiZTkwYTgwZTE1OGI3YjUiLCJpYXQiOjE2MDkwNTUwODMsImV4cCI6MTYwOTA1Njg4M30.6N6qC4eZUsiDxzFVLAv2IZ1FntNcAonztg5eN3GRuBc",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": []
+				},
+				"url": {
+					"raw": "http://localhost:4000/api/decryptedFilePublic/eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzZWNyZXRfY29kZSI6IjA5MjAwNDA5MjAwNDEyMzQiLCJmaWxlUGF0aCI6Ii8iLCJpYXQiOjE2MDkyMTA4NjQsImV4cCI6MTYxMTgwMjg2NH0.S8k3bkPvM22T_rOGwjsfVRCU53mDtQ2kqkTC2mWcrf0",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "4000",
+					"path": [
+						"api",
+						"decryptedFilePublic",
+						"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzZWNyZXRfY29kZSI6IjA5MjAwNDA5MjAwNDEyMzQiLCJmaWxlUGF0aCI6Ii8iLCJpYXQiOjE2MDkyMTA4NjQsImV4cCI6MTYxMTgwMjg2NH0.S8k3bkPvM22T_rOGwjsfVRCU53mDtQ2kqkTC2mWcrf0"
+					]
+				},
+				"description": "Get the Data as per token provided by public url"
+			},
+			"response": []
+		},
+		{
+			"name": "Login",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "username",
+							"value": "m4yank",
+							"type": "text"
+						},
+						{
+							"key": "password",
+							"value": "Password",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "http://localhost:4000/api/auth",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "4000",
+					"path": [
+						"api",
+						"auth"
+					]
+				},
+				"description": "Login the user using username and password"
+			},
+			"response": []
+		}
+	]
+}

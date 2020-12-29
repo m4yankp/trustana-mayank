@@ -53,7 +53,7 @@ export class Users {
                 res.status(400).send({
                     "success":false,
                     "error": true,
-                    "message": "Please provide all valid fields",
+                    "message": "Please make sure username is not already registered",
                 })
             } 
         });

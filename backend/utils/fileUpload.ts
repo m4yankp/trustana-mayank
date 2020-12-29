@@ -25,7 +25,7 @@ const validateFile = (
 // Returns a string for folder structure
 const getUploadPath = (): string => {
     const dt: Date = new Date();
-    return `uplaods/${dt.getFullYear()}/${dt.getMonth()}`;
+    return `uploads/${dt.getFullYear()}/${dt.getMonth()}`;
 };
 
 // Create storage engine as per multer documentation

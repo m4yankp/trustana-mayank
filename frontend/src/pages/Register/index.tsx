@@ -42,6 +42,7 @@ const { formFields, createChangeHandler, setValue } = useFormFields({
       //Form is valid 
       setValue("isLoading",true);
       setValue("validated",true);
+      setValue("isComplete",false);
       const address = `${formFields.address}, ${formFields.city}, ${formFields.state}, ${formFields.zip}`;
       const response = await RegisterService(formFields.firstName, formFields.lastName, formFields.dateOfBirth,formFields.username, formFields.password, formFields.secretToken, address,cvFile);
       if(response.error)

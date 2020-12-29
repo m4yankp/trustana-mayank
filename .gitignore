@@ -1,4 +1,5 @@
 backend/dist
+backend/uploads
 backend/node_modules
 backend/.env
 frontend/build
