@@ -3,4 +3,5 @@ backend/uploads
 backend/node_modules
 backend/.env
 frontend/build
+frontend/.env
 frontend/node_modules
